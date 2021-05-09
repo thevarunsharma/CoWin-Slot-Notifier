@@ -1,7 +1,7 @@
 # CoWin Slot Notifier
 A command line tool to fetch, display and notify about CoWin vaccination slots through E-Mail, based on Pincode or District, filtered by age.
 
-# Installation
+## Installation
 _Recommended to be used in a python virtual environment._
 - Create a python virtualenv and activate it.
 ```
@@ -13,8 +13,8 @@ $ source env/bin/activate
 (env)$ pip install .
 ```
 
-# Usage
-- Use as `cowin-notifier` through shell
+## Usage
+Use as `cowin-notifier` through shell
 ```
 (env)$ cowin-notifier --help
 Usage: cowin-notifier [OPTIONS] DATE
@@ -30,7 +30,7 @@ Options:
   --help                   Show this message and exit.
 ```
 
-# Example
+## Example
 Notify for slots in "south west delhi, delhi" starting from 9th May, 2021
 ```
 (env)$ cowin-notifier 9-5-2021 -d 'south west delhi' -s delhi
