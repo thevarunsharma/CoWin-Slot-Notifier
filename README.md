@@ -13,6 +13,21 @@ $ source env/bin/activate
 (env)$ pip install .
 ```
 
+### Important Note about credentials
+1. Create a text file `credentials` and place it in the same (top-level directory).
+```
+$ > credentials
+``` 
+2. To this file add the following information as text in the specified order
+```
+PORT_NUMBER 		# port number of SMTP server
+SMTP_SERVER		# name of STMP server (can be obtained from mail settings)
+FROM_EMAIL		# email of sender
+FROM_NAME		# name of sender
+TO_EMAIL		# email of reciever
+TO_NAME			# name of reciever
+PASSWORD		# login password of sender's email id
+```
 ## Usage
 Use as `cowin-notifier` through shell
 ```
