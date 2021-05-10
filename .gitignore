@@ -3,3 +3,4 @@ env/
 cowin_notifier.egg-info/
 credentials
 .cached/
+.previous/
