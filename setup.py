@@ -10,7 +10,7 @@ setup(
         'diskcache'],
     entry_points='''
         [console_scripts]
-        cowin-notifier=cowin_notifier.cowin_notifier:main
+        cowin-notifier=cowin_notifier.__init__:main
     ''',
     description="Sends E-Mail Notification for Available CoWin Slots"
 )
