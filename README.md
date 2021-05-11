@@ -18,23 +18,23 @@ $ source env/bin/activate
 ```
 $ > credentials
 ``` 
-2. To this file add the following information as text in the specified order
+2. To this file add the list of recipients in one of the following formats, one in each line
 ```
-PORT_NUMBER 		# port number of SMTP server
-SMTP_SERVER		# name of STMP server (can be obtained from mail settings)
-FROM_EMAIL		# email of sender
-FROM_NAME		# name of sender
-TO_EMAIL		# email of reciever
-TO_NAME			# name of reciever
-PASSWORD		# login password of sender's email id
+RECIPIENT_NAME <RECIPIENT_EMAIL_ADDRESS>
 ```
+OR
+```
+RECIPIENT_EMAIL_ADDRESS
+```
+exmaple: `John Doe <johndoe@xyz.com>` or `johndoe@xyz.com`
+
 ## Usage
-Use as `cowin-notifier` through shell
+- Use as `cowin-notifier` through shell
 ```
 (env)$ cowin-notifier --help
-Usage: cowin-notifier [OPTIONS] DATE
+Usage: cowin-notifier [OPTIONS]
 
-  Sends E-Mail Notification for available CoWin Slots on DATE
+  Sends E-Mail Notification for available CoWin Slots
 
 Options:
   -v, --verbose            Display verbose information
@@ -45,13 +45,15 @@ Options:
   --help                   Show this message and exit.
 ```
 
+- Upon running the tool, you will be prompted for your email and password for sending emails. Currently, __*only Outlook Mail is supported*__; Any non-outlook email id will result in authentication error.
+
 ## Example
-Notify for slots in "south west delhi, delhi" starting from 9th May, 2021
+Notify for slots in "south west delhi, delhi"
 ```
-(env)$ cowin-notifier 9-5-2021 -d 'south west delhi' -s delhi
+(env)$ cowin-notifier -d 'south west delhi' -s delhi
 ```
 OR
 ```
-(env)$ cowin-notifier 9-5-2021 --district='south west delhi' --state=delhi
+(env)$ cowin-notifier --district='south west delhi' --state=delhi
 ```
 
