@@ -16,7 +16,7 @@ RECUR_PERIOD = 60 * 5          # 5 minutes
 @click.option('--district', '-d', default=None, help='District to search by')
 @click.option('--state', '-s', default=None, help='State for district to search by')
 @click.option('--age-group', '-a', default=45, help='Age Group to filter by')
-@click.option('--recur-period', '-r', default=None, help='Frequency of recurring updation in seconds')
+@click.option('--recur-period', '-r', type=int, default=None, help='Frequency of recurring updation in seconds')
 def main(pincode,
          district,
          state,
@@ -42,7 +42,7 @@ def main(pincode,
     
     if recur_period:
         global RECUR_PERIOD
-        RECUR_PERIOD = int(recur_period)
+        RECUR_PERIOD = recur_period
         
     try:
         while True:
