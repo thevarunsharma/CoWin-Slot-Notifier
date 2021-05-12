@@ -39,13 +39,20 @@ def get_available_slots(date: str,
     for center in centers:
         center_id = center['center_id']
         center_name = center['name']
-        center_address = center['address']
+        center_address = ", ".join([
+            center['address'],
+            center['district_name'], 
+            center['state_name'],
+            f"Pincode: {center['pincode']}"
+            ])
+        fee_mode = center['fee_type']
         for session in center.get('sessions'):
             if session['available_capacity'] > 0 and session['min_age_limit'] <= age_group:
                 if center_id not in info:
                     info[center_id] = {
                             "name": center_name,
                             "address": center_address,
+                            "fee_mode": fee_mode,
                             "sessions": []
                             }
                 info[center_id]['sessions'].append({

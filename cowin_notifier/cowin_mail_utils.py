@@ -40,6 +40,7 @@ class CowinMailer:
             item_html = f"""<li>
             <h3>{center['name']}</h3>
             <h4>{center['address']}</h4>
+            <h4>Mode: {center['fee_mode']}</h4>
             <ul>
             """
             for sess in center['sessions']:
