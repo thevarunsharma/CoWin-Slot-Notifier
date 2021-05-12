@@ -82,7 +82,7 @@ def get_diff_value(available: dict,
     cached_centers = cache.get(key)
 
     # update cache
-    cache.add(key, fetched_centers, expire=CACHE_EXPIRATION_TIME)
+    cache.set(key, fetched_centers, expire=CACHE_EXPIRATION_TIME)
     
     if cached_centers is None and fetched_centers:
         return fetched_centers
