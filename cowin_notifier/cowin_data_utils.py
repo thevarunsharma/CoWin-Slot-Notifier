@@ -6,13 +6,23 @@ from .cowin_center_fetcher import fetch_centers_by_district_state, fetch_centers
 
 CACHE_EXPIRATION_TIME = 60 * 60 * 6        # 6 hours 
 
-def get_ist_date() -> str:
+def get_ist_date(offset: int = 12) -> str:
+    """
+    Return date in Indian Standard timezone
+    
+    Arguments
+    -----------
+    offset: number of hours to add to current time, default=12 
+    """
     # Indian Standard Timezone UTC +05:30
     ist_timezone = datetime.timezone(
         datetime.timedelta(hours=5, minutes=30)
     )
     # current date
     date = datetime.datetime.now(ist_timezone)
+    # offset
+    offset_delta = datetime.timedelta(hours=offset)
+    date = date + offset_delta
     # return date formatted as DD-MM-YYYY
     return date.strftime("%d-%m-%Y")
 
@@ -46,22 +56,21 @@ def get_available_slots(date: str,
             f"Pincode: {center['pincode']}"
             ])
         fee_mode = center['fee_type']
-        for session in center.get('sessions'):
-            if session['available_capacity'] > 0 and session['min_age_limit'] <= age_group:
-                if center_id not in info:
-                    info[center_id] = {
-                            "name": center_name,
-                            "address": center_address,
-                            "fee_mode": fee_mode,
-                            "sessions": []
-                            }
-                info[center_id]['sessions'].append({
-                    "date": session['date'],
-                    "available_capacity": session['available_capacity'],
-                    "age_limit": session['min_age_limit'],
-                    "vaccine": session['vaccine'],
-                    "slots": session['slots']
-                    })
+        available_capacity = center['available_capacity']
+        age_limit = center['min_age_limit']
+        vaccine = center['vaccine']
+        if available_capacity > 0 and age_limit <= age_group:
+            if center_id not in info:
+                info[center_id] = {
+                        "name": center_name,
+                        "address": center_address,
+                        "fee_mode": fee_mode,
+                        "date": center['date'],
+                        "available_capacity": available_capacity,
+                        "age_limit": age_limit,
+                        "vaccine": vaccine,
+                        "slots": center['slots']
+                    }
     return available
 
 def get_diff_value(available: dict,
@@ -91,25 +100,17 @@ def get_diff_value(available: dict,
     diff_centers = {}
     for center_id, value in fetched_centers.items():
         if center_id in cached_centers:
-            # search differing sessions
-            for fsession in value['sessions']:
-                date_match = [csession for csession in cached_centers[center_id]['sessions'] 
-                                       if csession['date'] == fsession['date']
-                                          and fsession['age_limit'] == csession['age_limit']
-                                          and fsession['vaccine'] == csession['vaccine']
-                            ]
-                if date_match:
-                    for csession in date_match:
-                        if fsession['available_capacity'] > csession['available_capacity']:
-                            if center_id not in diff_centers:
-                               center = diff_centers[center_id] = value
-                               center['sessions'] = []
-                            diff_centers[center_id]['sessions'].append(fsession)
-                else:
-                    if center_id not in diff_centers:
-                        center = diff_centers[center_id] = value
-                        center['sessions'] = []
-                    diff_centers[center_id]['sessions'].append(fsession)
+            # search difference in similar values
+            cached_value = cached_centers[center_id]
+            if cached_value['date'] == value['date'] \
+            and cached_value['age_limit'] == value['age_limit'] \
+            and cached_value['vaccine'] == value['vaccine']:
+                # if same slot found but more capacity
+                if cached_value['available_capacity'] < value['available_capacity']:
+                    diff_centers[center_id] = value
+            
+            else:
+                diff_centers[center_id] = value
         else:
             diff_centers[center_id] = value
 

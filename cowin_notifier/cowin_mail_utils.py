@@ -37,20 +37,24 @@ class CowinMailer:
         header_html = f"<h3>Slots Available in {area_info}</h3>"
         info_html = "<ol>"
         for center_id, center in info.get("centers").items():
+            """
+            "name": center_name,
+            "address": center_address,
+            "fee_mode": fee_mode,
+            "date": center['date'],
+            "available_capacity": available_capacity,
+            "age_limit": age_limit,
+            "vaccine": vaccine,
+            "slots": center['slots']
+            """
             item_html = f"""<li>
             <h3>{center['name']}</h3>
             <h4>{center['address']}</h4>
             <h4>Mode: {center['fee_mode']}</h4>
-            <ul>
+            <strong>{center['date']} &nbsp&nbsp&nbsp&nbsp Available: {center['available_capacity']}</strong><br/>
+            Age Limit: {center['age_limit']} &nbsp&nbsp&nbsp&nbsp Vaccine: <i>{center['vaccine']}</i>
+            </li>
             """
-            for sess in center['sessions']:
-                item_html += f"""
-                <li>
-                    <strong>{sess['date']} &nbsp&nbsp&nbsp&nbsp Available: {sess['available_capacity']}</strong><br/>
-                    Age Limit: {sess['age_limit']} &nbsp&nbsp&nbsp&nbsp Vaccine: <i>{sess['vaccine']}</i>
-                </li>
-                """
-            item_html += "</ul></li>"
             info_html += item_html
         info_html += "</ol>"
         html = f"""

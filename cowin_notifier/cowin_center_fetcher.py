@@ -30,7 +30,7 @@ def fetch_centers_by_pincode(pincode: str,
     date: start date in DD-MM-YYYY format for search results
     """
 
-    url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin"
+    url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByPin"
     params = {
             "pincode" : pincode,
             "date": date
@@ -41,7 +41,7 @@ def fetch_centers_by_pincode(pincode: str,
                        headers=headers)
 
     req.raise_for_status()
-    return req.json().get('centers')
+    return req.json().get('sessions')
 
 
 
@@ -141,7 +141,7 @@ def fetch_centers_by_district_id(district_id: int,
     date: start date in DD-MM-YYYY format for search results
     """
 
-    url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict"
+    url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict"
     params = {
             "district_id": district_id,
             "date": date
@@ -152,7 +152,7 @@ def fetch_centers_by_district_id(district_id: int,
                        headers=headers)
 
     req.raise_for_status()
-    return req.json().get('centers')
+    return req.json().get('sessions')
 
 
 def fetch_centers_by_district_state(district: str,
