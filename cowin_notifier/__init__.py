@@ -46,7 +46,6 @@ def main(pincode,
         
     try:
         while True:
-            print("fetching")
             cache.expire()
             date = get_ist_date()
             # fetch available slots
