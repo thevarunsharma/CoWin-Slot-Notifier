@@ -16,11 +16,13 @@ RECUR_PERIOD = 60 * 5          # 5 minutes
 @click.option('--district', '-d', default=None, help='District to search by')
 @click.option('--state', '-s', default=None, help='State for district to search by')
 @click.option('--age-group', '-a', default=45, help='Age Group to filter by')
+@click.option('--recur-period', '-r', default=None, help='Frequency of recurring updation in seconds')
 def main(pincode,
          district,
          state,
          age_group,
-         verbose):
+         verbose,
+         recur_period):
     """
     Sends E-Mail Notification for available CoWin Slots
     """
@@ -38,8 +40,13 @@ def main(pincode,
                          sender_name, 
                          password)
     
+    if recur_period:
+        global RECUR_PERIOD
+        RECUR_PERIOD = int(recur_period)
+        
     try:
         while True:
+            print("fetching")
             cache.expire()
             date = get_ist_date()
             # fetch available slots
