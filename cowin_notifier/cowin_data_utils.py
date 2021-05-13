@@ -6,13 +6,13 @@ from .cowin_center_fetcher import fetch_centers_by_district_state, fetch_centers
 
 CACHE_EXPIRATION_TIME = 60 * 60 * 6        # 6 hours 
 
-def get_ist_date(offset: int = 12) -> str:
+def next_x_days(count:int = 5) -> list:
     """
-    Return date in Indian Standard timezone
+    Return dates for next `count` number od days in Indian Standard timezone
     
     Arguments
     -----------
-    offset: number of hours to add to current time, default=12 
+    count: number of next days for which dates are to be fetched, default=7 
     """
     # Indian Standard Timezone UTC +05:30
     ist_timezone = datetime.timezone(
@@ -20,11 +20,16 @@ def get_ist_date(offset: int = 12) -> str:
     )
     # current date
     date = datetime.datetime.now(ist_timezone)
-    # offset
-    offset_delta = datetime.timedelta(hours=offset)
-    date = date + offset_delta
+    
+    dates = []
+    for days in range(count):
+        # offset
+        offset_delta = datetime.timedelta(days=days)
+        next_date = date + offset_delta
+        dates.append(next_date)
+        
     # return date formatted as DD-MM-YYYY
-    return date.strftime("%d-%m-%Y")
+    return [date.strftime("%d-%m-%Y") for date in dates]
 
 def get_available_slots(date: str, 
                         pincode: str = None, 
@@ -45,6 +50,7 @@ def get_available_slots(date: str,
     else:
         raise ValueError("Either 'pincode' or both 'state' and 'district' need to be passed")
     
+    available["date"] = date
     info = available["centers"] = {}
     for center in centers:
         center_id = center['center_id']
@@ -65,7 +71,6 @@ def get_available_slots(date: str,
                         "name": center_name,
                         "address": center_address,
                         "fee_mode": fee_mode,
-                        "date": center['date'],
                         "available_capacity": available_capacity,
                         "age_limit": age_limit,
                         "vaccine": vaccine,
@@ -102,8 +107,8 @@ def get_diff_value(available: dict,
         if center_id in cached_centers:
             # search difference in similar values
             cached_value = cached_centers[center_id]
-            if cached_value['date'] == value['date'] \
-            and cached_value['age_limit'] == value['age_limit'] \
+            # date is already the same
+            if cached_value['age_limit'] == value['age_limit'] \
             and cached_value['vaccine'] == value['vaccine']:
                 # if same slot found but more capacity
                 if cached_value['available_capacity'] < value['available_capacity']:

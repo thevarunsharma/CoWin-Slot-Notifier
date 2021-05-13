@@ -4,7 +4,7 @@ import click
 import gc
 import json
 import time
-from .cowin_data_utils import get_ist_date, get_available_slots, get_diff_value
+from .cowin_data_utils import get_available_slots, get_diff_value, next_x_days
 from .cowin_mail_utils import CowinMailer
 from diskcache import Cache
 
@@ -16,12 +16,14 @@ RECUR_PERIOD = 60 * 5          # 5 minutes
 @click.option('--district', '-d', default=None, help='District to search by')
 @click.option('--state', '-s', default=None, help='State for district to search by')
 @click.option('--age-group', '-a', default=45, help='Age Group to filter by')
+@click.option('--check-period', '-c', default=5, help='Number of days in future to be checked')
 @click.option('--recur-period', '-r', type=int, default=None, help='Frequency of recurring updation in seconds')
 def main(pincode,
          district,
          state,
          age_group,
          verbose,
+         check_period,
          recur_period):
     """
     Sends E-Mail Notification for available CoWin Slots
@@ -47,38 +49,40 @@ def main(pincode,
     try:
         while True:
             cache.expire()
-            date = get_ist_date()
-            # fetch available slots
-            available = get_available_slots(date, 
-                                            pincode=pincode, 
-                                            state=state, 
-                                            district=district, 
-                                            age_group=age_group)
+            dates = next_x_days(check_period)
             
-            # get difference from cached value and update it
-            centers = get_diff_value(available,
-                                     cache,
-                                     date,
-                                     pincode=pincode,
-                                     state=state,
-                                     district=district,
-                                     age_group=age_group)
-            
-            if centers is not None:
-                # if cached value doesn't match current value
-                click.echo("{0:-^100}".format("NEW CoWIN SLOTS FOUND"))
-                available['centers'] = centers
+            for date in dates:
+                # fetch available slots
+                available = get_available_slots(date, 
+                                                pincode=pincode, 
+                                                state=state, 
+                                                district=district, 
+                                                age_group=age_group)
+                
+                # get difference from cached value and update it
+                centers = get_diff_value(available,
+                                        cache,
+                                        date,
+                                        pincode=pincode,
+                                        state=state,
+                                        district=district,
+                                        age_group=age_group)
+                
+                if centers is not None:
+                    # if cached value doesn't match current value
+                    click.echo("{0:-^100}".format("NEW CoWIN SLOTS FOUND"))
+                    available['centers'] = centers
 
-                if verbose:
-                    click.echo(json.dumps(available, indent=2))
-    
-                if available['centers']:
-                    mailer.send_email_notif(available)
-                    click.echo("EMAIL NOTIFICATION SENT SUCCESSFULLY!")
-            
+                    if verbose:
+                        click.echo(json.dumps(available, indent=2))
+        
+                    if available['centers']:
+                        mailer.send_email_notif(available)
+                        click.echo("EMAIL NOTIFICATION SENT SUCCESSFULLY!")
+                
             gc.collect()
             time.sleep(RECUR_PERIOD)
-    
+
     except KeyboardInterrupt:
         cache.close()
         click.echo("Aborted.")
