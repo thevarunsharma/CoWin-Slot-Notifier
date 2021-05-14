@@ -30,11 +30,11 @@ def main(pincode,
     """
     cache = Cache(".previous")
     # sender's name for email
-    sender_name = click.prompt("Sender's Name", default="CoWin Notifier")
+    sender_name = click.prompt("Sender's Name", default="CoWin Notifier").strip()
     # sender's email address
-    sender_email = click.prompt("Sender's Email")
+    sender_email = click.prompt("Sender's Email").strip()
     # sender's login password
-    password = click.prompt("Password", hide_input=True, confirmation_prompt=True)
+    password = click.prompt("Password", hide_input=True, confirmation_prompt=True).strip()
     
     click.echo("CoWin Notifier running...")
     # mailer for sending emails

@@ -71,12 +71,12 @@ def fetch_state_id(state: str) -> int:
     """
     
     # regex pattern match state name with values in list
-    pattern = re.compile(r".*" + r"\s*".join(state.lower().split()) + r".*")
+    pattern = re.compile(r"^" + r"\s*".join(state.lower().split()) + r".*")
     
     states = fetch_states()
     for entry in states:
         state_id = entry.get("state_id")
-        state_name = entry.get("state_name").lower()
+        state_name = entry.get("state_name").lower().strip()
 
         if pattern.match(state_name):
             return state_id
@@ -116,13 +116,13 @@ def fetch_district_id(district: str,
     """
 
     # regex pattern to match with district names in list
-    pattern = re.compile(r".*" + r"\s*".join(district.lower().split()) + r".*")
+    pattern = re.compile(r"^" + r"\s*".join(district.lower().split()) + r".*")
     
     state_id = fetch_state_id(state)
     districts = fetch_districts(state_id)
     for entry in districts:
         district_id = entry.get("district_id")
-        district_name = entry.get("district_name").lower()
+        district_name = entry.get("district_name").lower().strip()
         
         if pattern.match(district_name):
             return district_id

@@ -79,6 +79,9 @@ class CowinMailer:
         self.sender_email = sender_email
         self.sender_name = sender_name
         self.password = password
+        # authorize login details
+        __class__.auth_credentials(self.sender_email, self.password)
+        # list of recipients
         self.recipients = []
         with open("credentials", "r") as fh:
             for line in fh.readlines():
