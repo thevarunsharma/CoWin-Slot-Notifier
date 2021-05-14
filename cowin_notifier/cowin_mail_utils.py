@@ -32,30 +32,35 @@ class CowinMailer:
         raise ValueError(f"Error while parsing recipient info '{line}'")
     
     @staticmethod
-    def format_as_HTML(info):
-        area_info = ", ".join(f"{key}: <i>{str(val).title()}</i>" for key, val in info["area"].items())
-        header_html = f"<h3>Slots Available in {area_info} on {info['date']}</h3>"
-        info_html = "<ol>"
-        for center_id, center in info.get("centers").items():
-            item_html = f"""<li>
-            <h3>{center['name']}</h3>
-            <h4>{center['address']}</h4>
-            <h4>Mode: {center['fee_mode']}</h4>
-            <strong>Available: {center['available_capacity']}</strong><br/>
-            Age Limit: {center['age_limit']} &nbsp&nbsp&nbsp&nbsp Vaccine: <i>{center['vaccine']}</i>
-            </li>
-            """
-            info_html += item_html
-        info_html += "</ol>"
-        html = f"""
-        <html>
-            <body>
+    def format_as_HTML(found_info: list):
+        html = "" 
+        for info in found_info:
+            area_info = ", ".join(f"{key}: <i>{str(val).title()}</i>" for key, val in info["area"].items())
+            header_html = f"<h3>Slots Available in {area_info} on {info['date']}</h3>"
+            info_html = "<ol>"
+            for center_id, center in info.get("centers").items():
+                item_html = f"""<li>
+                <h3>{center['name']}</h3>
+                <h4>{center['address']}</h4>
+                <h4>Mode: {center['fee_mode']}</h4>
+                <strong>Available: {center['available_capacity']}</strong><br/>
+                Age Limit: {center['age_limit']} &nbsp&nbsp&nbsp&nbsp Vaccine: <i>{center['vaccine']}</i>
+                </li>
+                """
+                info_html += item_html
+            info_html += "</ol>"
+            html += f"""
                 {header_html}
                 {info_html}
+            """
+        final_html = f"""
+        <html>
+            <body>
+                {html}
             </body>
         </html>
         """
-        return html
+        return final_html
     
     @staticmethod
     def auth_credentials(email: str,
@@ -96,13 +101,13 @@ class CowinMailer:
 
 
     def send_email_notif(self, 
-                         info: dict):
+                         found_info: list):
         
         mailserver = smtplib.SMTP(__class__.SMTP_SERVER, __class__.PORT_NUMBER)
         mailserver.starttls()
         mailserver.login(self.sender_email, self.password)
     
-        html = __class__.format_as_HTML(info)
+        html = __class__.format_as_HTML(found_info)
         
         for recipient in self.recipients:
             to_name = recipient['to_name']

@@ -51,6 +51,7 @@ def main(pincode,
             cache.expire()
             dates = next_x_days(check_period)
             
+            found = []          # list of found available slots
             for date in dates:
                 # fetch available slots
                 available = get_available_slots(date, 
@@ -70,16 +71,16 @@ def main(pincode,
                 
                 if centers is not None:
                     # if cached value doesn't match current value
-                    click.echo("{0:-^100}".format("NEW CoWIN SLOTS FOUND"))
-                    available['centers'] = centers
-
-                    if verbose:
-                        click.echo(json.dumps(available, indent=2))
-        
-                    if available['centers']:
-                        mailer.send_email_notif(available)
-                        click.echo("EMAIL NOTIFICATION SENT SUCCESSFULLY!")
+                    found.append(available)
+            
+            if found:
+                click.echo("{0:-^100}".format("NEW CoWIN SLOTS FOUND"))
+                if verbose:
+                    click.echo(json.dumps(found, indent=2))
                 
+                mailer.send_email_notif(found)
+                click.echo("EMAIL NOTIFICATION SENT SUCCESSFULLY!")
+        
             gc.collect()
             time.sleep(RECUR_PERIOD)
 
