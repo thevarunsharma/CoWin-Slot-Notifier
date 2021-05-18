@@ -18,13 +18,17 @@ RECUR_PERIOD = 60 * 5          # 5 minutes
 @click.option('--age-group', '-a', default=45, help='Age Group to filter by')
 @click.option('--check-period', '-c', default=5, help='Number of days in future to be checked')
 @click.option('--recur-period', '-r', type=int, default=None, help='Frequency of recurring updation in seconds')
+@click.option('--vaccine', default=None, help='Specific vaccine')
+@click.option('--dose', type=int, default=None, help='Dose 1 or 2')
 def main(pincode,
          district,
          state,
          age_group,
          verbose,
          check_period,
-         recur_period):
+         recur_period,
+         vaccine,
+         dose):
     """
     Sends E-Mail Notification for available CoWin Slots
     """
@@ -58,7 +62,9 @@ def main(pincode,
                                                 pincode=pincode, 
                                                 state=state, 
                                                 district=district, 
-                                                age_group=age_group)
+                                                age_group=age_group,
+                                                vaccine=vaccine,
+                                                dose=dose)
                 
                 # get difference from cached value and update it
                 centers = get_diff_value(available,
@@ -67,7 +73,9 @@ def main(pincode,
                                         pincode=pincode,
                                         state=state,
                                         district=district,
-                                        age_group=age_group)
+                                        age_group=age_group,
+                                        vaccine=vaccine,
+                                        dose=dose)
                 
                 if centers is not None:
                     # if cached value doesn't match current value

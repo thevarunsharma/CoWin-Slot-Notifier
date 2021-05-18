@@ -35,7 +35,9 @@ def get_available_slots(date: str,
                         pincode: str = None, 
                         state: str = None, 
                         district: str = None,
-                        age_group: int = 45) -> dict:
+                        age_group: int = 45,
+                        vaccine: str = None,
+                        dose: int = None) -> dict:
     if pincode:
         centers = fetch_centers_by_pincode(pincode, date)
         available = {"area" : {
@@ -50,6 +52,20 @@ def get_available_slots(date: str,
     else:
         raise ValueError("Either 'pincode' or both 'state' and 'district' need to be passed")
     
+    if dose is not None and dose > 2:
+        raise ValueError('Dose can either be 1 or 2')
+    
+    if vaccine is not None:
+        vaccine = vaccine.strip().upper()
+        if vaccine not in ['COVAXIN', 'COVISHIELD']:
+            raise ValueError(f" No vaccine named '{vaccine}'")
+    
+    availablity_key = {
+        1: 'available_capacity_dose1',
+        2: 'available_capacity_dose2',
+        None: 'available_capacity'
+    }[dose]
+    
     available["date"] = date
     info = available["centers"] = {}
     for center in centers:
@@ -62,9 +78,11 @@ def get_available_slots(date: str,
             f"Pincode: {center['pincode']}"
             ])
         fee_mode = center['fee_type']
-        available_capacity = center['available_capacity']
+        available_capacity = center[availablity_key]
         age_limit = center['min_age_limit']
-        vaccine = center['vaccine']
+        available_vaccine = center['vaccine']
+        if available_vaccine != vaccine:
+            continue
         if available_capacity > 0 and age_limit <= age_group:
             if center_id not in info:
                 info[center_id] = {
@@ -73,7 +91,7 @@ def get_available_slots(date: str,
                         "fee_mode": fee_mode,
                         "available_capacity": available_capacity,
                         "age_limit": age_limit,
-                        "vaccine": vaccine,
+                        "vaccine": available_vaccine,
                         "slots": center['slots']
                     }
     return available
@@ -84,14 +102,16 @@ def get_diff_value(available: dict,
                    pincode: str = None,
                    state: str = None,
                    district: str = None,
-                   age_group: int = 45) -> dict:
+                   age_group: int = 45,
+                   vaccine: str = None,
+                   dose: int = None) -> dict:
 
     """
     Returns the difference in value from cached value if present otherwise the newly fetched value. 
     Also, updates the cache with the newly fetched 
     """
     # use the fetch-arguments as key
-    key = (date, pincode, state, district, age_group)
+    key = (date, pincode, state, district, age_group, vaccine, dose)
     fetched_centers = available['centers']
     cached_centers = cache.get(key)
 
