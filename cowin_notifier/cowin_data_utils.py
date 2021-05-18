@@ -52,13 +52,18 @@ def get_available_slots(date: str,
     else:
         raise ValueError("Either 'pincode' or both 'state' and 'district' need to be passed")
     
-    if dose is not None and dose > 2:
-        raise ValueError('Dose can either be 1 or 2')
+    filters = available["filters"] = {}
+    
+    if dose is not None:
+        if dose > 2:
+            raise ValueError('Dose can either be 1 or 2')
+        filters["dose"] = dose
     
     if vaccine is not None:
         vaccine = vaccine.strip().upper()
         if vaccine not in ['COVAXIN', 'COVISHIELD']:
             raise ValueError(f" No vaccine named '{vaccine}'")
+        filters["vaccine"] = vaccine
     
     availablity_key = {
         1: 'available_capacity_dose1',
@@ -81,7 +86,7 @@ def get_available_slots(date: str,
         available_capacity = center[availablity_key]
         age_limit = center['min_age_limit']
         available_vaccine = center['vaccine']
-        if available_vaccine != vaccine:
+        if vaccine is not None and available_vaccine != vaccine:
             continue
         if available_capacity > 0 and age_limit <= age_group:
             if center_id not in info:

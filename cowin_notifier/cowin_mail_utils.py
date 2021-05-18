@@ -37,6 +37,13 @@ class CowinMailer:
         for info in found_info:
             area_info = ", ".join(f"{key}: <i>{str(val).title()}</i>" for key, val in info["area"].items())
             header_html = f"<h3>Slots Available in {area_info} on {info['date']}</h3>"
+            filter_html = "<i>Filters:</i> "
+            if info["filters"]:
+                filter_html += ", ".join(f'{key.title()}: {value}' 
+                                         for key, value in info["filters"].items())
+            else:
+                filter_html += "NONE"
+                
             info_html = "<ol>"
             for center_id, center in info.get("centers").items():
                 item_html = f"""<li>
@@ -51,6 +58,7 @@ class CowinMailer:
             info_html += "</ol>"
             html += f"""
                 {header_html}
+                {filter_html}
                 {info_html}
             """
         final_html = f"""
