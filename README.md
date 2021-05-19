@@ -26,7 +26,7 @@ OR
 ```
 RECIPIENT_EMAIL_ADDRESS
 ```
-exmaple: `John Doe <johndoe@xyz.com>` or `johndoe@xyz.com`
+example: `John Doe <johndoe@xyz.com>` or `johndoe@xyz.com`
 
 ## Usage
 - Use as `cowin-notifier` through shell
@@ -37,12 +37,16 @@ Usage: cowin-notifier [OPTIONS]
   Sends E-Mail Notification for available CoWin Slots
 
 Options:
-  -v, --verbose            Display verbose information
-  -p, --pincode TEXT       Pincode to search by
-  -d, --district TEXT      District to search by
-  -s, --state TEXT         State for district to search by
-  -a, --age-group INTEGER  Age Group to filter by
-  --help                   Show this message and exit.
+  -v, --verbose               Display verbose information
+  -p, --pincode TEXT          Pincode to search by
+  -d, --district TEXT         District to search by
+  -s, --state TEXT            State for district to search by
+  -a, --age-group INTEGER     Age Group to filter by
+  -c, --check-period INTEGER  Number of days in future to be checked
+  -r, --recur-period INTEGER  Frequency of recurring updation in seconds
+  --vaccine TEXT              Specific vaccine
+  --dose INTEGER              Dose 1 or 2
+  --help                      Show this message and exit.
 ```
 
 - Upon running the tool, you will be prompted for your email and password for sending emails. Currently, __*only Outlook Mail is supported*__; Any non-outlook email id will result in authentication error.
