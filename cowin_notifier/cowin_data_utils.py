@@ -37,7 +37,8 @@ def get_available_slots(date: str,
                         district: str = None,
                         age_group: int = 45,
                         vaccine: str = None,
-                        dose: int = None) -> dict:
+                        dose: int = None,
+                        fee_mode: str = None) -> dict:
     if pincode:
         centers = fetch_centers_by_pincode(pincode, date)
         available = {"area" : {
@@ -64,6 +65,9 @@ def get_available_slots(date: str,
         if vaccine not in ['COVAXIN', 'COVISHIELD']:
             raise ValueError(f" No vaccine named '{vaccine}'")
         filters["vaccine"] = vaccine
+        
+    if fee_mode is not None:
+        filters["fee_mode"] = fee_mode
     
     availablity_key = {
         1: 'available_capacity_dose1',
@@ -82,18 +86,20 @@ def get_available_slots(date: str,
             center['state_name'],
             f"Pincode: {center['pincode']}"
             ])
-        fee_mode = center['fee_type']
+        center_fee_mode = center['fee_type']
         available_capacity = center[availablity_key]
         age_limit = center['min_age_limit']
         available_vaccine = center['vaccine']
         if vaccine is not None and available_vaccine != vaccine:
+            continue
+        if fee_mode is not None and center_fee_mode != fee_mode:
             continue
         if available_capacity > 0 and age_limit <= age_group:
             if center_id not in info:
                 info[center_id] = {
                         "name": center_name,
                         "address": center_address,
-                        "fee_mode": fee_mode,
+                        "fee_mode": center_fee_mode,
                         "available_capacity": available_capacity,
                         "age_limit": age_limit,
                         "vaccine": available_vaccine,
@@ -109,14 +115,15 @@ def get_diff_value(available: dict,
                    district: str = None,
                    age_group: int = 45,
                    vaccine: str = None,
-                   dose: int = None) -> dict:
+                   dose: int = None,
+                   fee_mode: str = None) -> dict:
 
     """
     Returns the difference in value from cached value if present otherwise the newly fetched value. 
     Also, updates the cache with the newly fetched 
     """
     # use the fetch-arguments as key
-    key = (date, pincode, state, district, age_group, vaccine, dose)
+    key = (date, pincode, state, district, age_group, vaccine, dose, fee_mode)
     fetched_centers = available['centers']
     cached_centers = cache.get(key)
 

@@ -20,15 +20,19 @@ RECUR_PERIOD = 60 * 5          # 5 minutes
 @click.option('--recur-period', '-r', type=int, default=None, help='Frequency of recurring updation in seconds')
 @click.option('--vaccine', default=None, help='Specific vaccine')
 @click.option('--dose', type=int, default=None, help='Dose 1 or 2')
-def main(pincode,
-         district,
-         state,
-         age_group,
-         verbose,
-         check_period,
-         recur_period,
-         vaccine,
-         dose):
+@click.option('--free', is_flag=True, help='Filter by free vaccines')
+@click.option('--paid', is_flag=True, help='Filter by paid vaccines')
+def main(pincode: str,
+         district: str,
+         state: str,
+         age_group: int,
+         verbose: bool,
+         check_period: int,
+         recur_period: int,
+         vaccine: str,
+         dose: int,
+         free: bool,
+         paid: bool):
     """
     Sends E-Mail Notification for available CoWin Slots
     """
@@ -39,17 +43,26 @@ def main(pincode,
     sender_email = click.prompt("Sender's Email").strip()
     # sender's login password
     password = click.prompt("Password", hide_input=True, confirmation_prompt=True).strip()
-    
-    click.echo("CoWin Notifier running...")
+
+    click.echo("Verifying Email Credentials...")
     # mailer for sending emails
     mailer = CowinMailer(sender_email, 
                          sender_name, 
                          password)
-    
+
+    click.echo("Verified. CoWin Notifier running...")
+
     if recur_period:
         global RECUR_PERIOD
         RECUR_PERIOD = recur_period
         
+    # select fee mode
+    fee_mode = None
+    if free and not paid:
+        fee_mode = "Free"
+    elif paid and not free:
+        fee_mode = "Paid"
+    
     try:
         while True:
             cache.expire()
@@ -64,7 +77,8 @@ def main(pincode,
                                                 district=district, 
                                                 age_group=age_group,
                                                 vaccine=vaccine,
-                                                dose=dose)
+                                                dose=dose,
+                                                fee_mode=fee_mode)
                 
                 # get difference from cached value and update it
                 centers = get_diff_value(available,
@@ -75,7 +89,8 @@ def main(pincode,
                                         district=district,
                                         age_group=age_group,
                                         vaccine=vaccine,
-                                        dose=dose)
+                                        dose=dose,
+                                        fee_mode=fee_mode)
                 
                 if centers is not None:
                     # if cached value doesn't match current value
