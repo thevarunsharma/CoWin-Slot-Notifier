@@ -31,8 +31,7 @@ example: `John Doe <johndoe@xyz.com>` or `johndoe@xyz.com`
 ## Usage
 - Use as `cowin-notifier` through shell
 ```
-(env)$ cowin-notifier --help
-Usage: cowin-notifier [OPTIONS]
+(env)
 
   Sends E-Mail Notification for available CoWin Slots
 
@@ -46,6 +45,8 @@ Options:
   -r, --recur-period INTEGER  Frequency of recurring updation in seconds
   --vaccine TEXT              Specific vaccine
   --dose INTEGER              Dose 1 or 2
+  --free                      Filter by free vaccines
+  --paid                      Filter by paid vaccines
   --help                      Show this message and exit.
 ```
 
